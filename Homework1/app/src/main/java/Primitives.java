@@ -1,4 +1,4 @@
-public class Primitives {
+public class Primitives extends java.lang.Object {
     boolean truthy = true; // true or false
     // Boolean b;
 

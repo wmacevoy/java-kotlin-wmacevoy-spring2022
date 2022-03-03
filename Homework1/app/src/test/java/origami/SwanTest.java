@@ -6,10 +6,33 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 public class SwanTest {
 
     Swan defSwan;
     Swan foilSwan;
+
+    String [] names = {"black", "grey", "white", "ugly" };
+
+    Swan getSwan(String name) {
+        switch(name) {
+            case "black" : return new Swan("felt",3,5);
+            case "grey" : {
+                Swan grey = new Swan("felt",3,5);
+                grey.addCygnet(new Swan("foil", 1,2));
+                return grey;
+            }
+            case "white" : return new Swan("paper",3,5);
+            case "ugly" : return new Swan("papyrus", 3, 5);
+        }
+        throw new IllegalArgumentException();
+    }
+
 
     @Before
     public void setUp() throws Exception {
@@ -22,6 +45,55 @@ public class SwanTest {
     }
 
     @Test
+    public void swanHash() {
+        for (int id1 = 0; id1 < names.length; ++id1) {
+            Swan swan1 = getSwan(names[id1]);
+            for (int id2 = 0; id2 < names.length; ++id2) {
+                Swan swan2 = getSwan(names[id2]);
+                if (id1 != id2) {
+                    assertNotEquals(swan1.hashCode(), swan2.hashCode());
+                    assertFalse(swan1.equals(swan2));
+                } else {
+                    assertEquals(swan1.hashCode(), swan2.hashCode());
+                    assertTrue(swan1.equals(swan2));
+                }
+            }
+        }
+    }
+
+    @Test
+    public void swanSet() {
+        int nSubsets=(int) Math.pow(2.0,(double) names.length);
+        for (int type = 0; type < 2; ++type) {
+            for (int subset = 0; subset < nSubsets; ++subset) {
+                Set<Swan> swans = (type == 0) ?
+                            new HashSet<Swan>() :
+                            new TreeSet<Swan>();
+                for (int id = 0; id < names.length; ++id) {
+                    if ((subset & (1 << id)) != 0) {
+                        swans.add(getSwan(names[id]));
+                    }
+                }
+                for (int id = 0; id < names.length; ++id) {
+                    boolean containsId = ((subset & (1 << id)) != 0);
+                    assertEquals(containsId, swans.contains(getSwan(names[id])));
+                }
+            }
+        }
+    }
+
+    @Test
+    public void swanMap() {
+        Map<Swan,Long> barCodes = new TreeMap<Swan,Long>();
+        barCodes.put(getSwan("grey"),123_234_234_234_242L);
+        barCodes.put(getSwan("white"),33L);
+        assertEquals(null, barCodes.get(getSwan("black")));
+        assertEquals(new Long(123_234_234_234_242L), barCodes.get(getSwan("grey")));
+
+    }
+
+
+        @Test
     public void make() {
         assertEquals(0, defSwan.getStep());
         assertEquals(Swan.DEFAULT_MATERIAL, defSwan.getMaterial());
