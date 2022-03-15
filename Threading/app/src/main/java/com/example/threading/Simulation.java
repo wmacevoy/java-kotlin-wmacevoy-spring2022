@@ -26,13 +26,13 @@ public class Simulation
 
     Airport makeAirport() {
         Airport airport = new Airport();
-        for (int i=0; i<10; ++i) {
+        for (int i = 0; i < 10; ++i) {
             airport.travelers.add(makePassenger());
         }
         for (int i=0; i<5; ++i) {
             Airplane airplane = makeAirplane();
             airport.airplanes.add(airplane);
-            airplane.itinerary.add(airport);
+            airplane.addItinerary(airport);
         }
         return airport;
     }
@@ -41,7 +41,7 @@ public class Simulation
                         List<Airport> destinations) {
         for (Airplane airplane : airplanes) {
             int dest = (int) (destinations.size() * Math.random());
-            airplane.itinerary.add(destinations.get(dest));
+            airplane.addItinerary(destinations.get(dest));
         }
     }
 

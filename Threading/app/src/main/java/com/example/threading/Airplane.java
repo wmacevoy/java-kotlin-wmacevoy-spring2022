@@ -7,26 +7,41 @@ import java.util.TreeSet;
 
 public class Airplane implements Runnable {
     String name;
-    Set<Passenger> passengers = new TreeSet<Passenger>();
-    LinkedList<Airport> itinerary = new LinkedList<Airport>();
+    private Set<Passenger> passengers = new TreeSet<Passenger>();
+    private Itinerary itinerary = new Itinerary();
     boolean running = true;
+
+    public void addItinerary(Airport airport) {
+        itinerary.add(airport);
+    }
+    public void loadPassengers(Airport airport) {
+        int n = 1+ ((int) Math.random()*3);
+        for (int i=0;i<n; ++i) {
+            Passenger passenger = airport.travelers.getRandomPassenger();
+            if (passenger != null) {
+                passengers.add(passenger);
+            }
+        }
+    }
+
+    public void unloadPassengers(Airport airport) {
+        airport.travelers.addAll(passengers);
+        passengers.clear();
+    }
 
     @Override public void run() {
         while (running) {
             try {
-                if (itinerary.size() < 2) {
+                Leg leg = itinerary.firstLeg();
+                if (leg == null) {
                     Thread.sleep(10);
                 } else {
-                    Airport at = itinerary.getFirst();
-                    at.loadPassengers(this);
-                    itinerary.removeFirst();
-
-                    Airport dest = itinerary.getFirst();
-                    System.out.println("Flying " + name + " from " + at + " to " + dest + "...");
+                    loadPassengers(leg.from);
+                    System.out.println("Flying " + name + " from " + leg.from + " to " + leg.to + "...");
                     try {
                         Thread.sleep(4000);
                     } finally {
-                        dest.unloadPassengers(this);
+                        unloadPassengers(leg.to);
                     }
                 }
             } catch (InterruptedException ex) {
