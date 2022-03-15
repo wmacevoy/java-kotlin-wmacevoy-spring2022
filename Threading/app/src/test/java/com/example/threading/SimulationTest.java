@@ -12,7 +12,7 @@ public class SimulationTest {
         Simulation sim = new Simulation();
         System.out.println("start.");
         sim.setup();
-        Thread.sleep(30_000);
+        Thread.sleep(60_000);
         System.out.println("stop.");
     }
 

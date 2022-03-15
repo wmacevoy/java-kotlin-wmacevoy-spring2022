@@ -15,7 +15,7 @@ public class Airplane implements Runnable {
         while (running) {
             try {
                 if (itinerary.size() < 2) {
-                    Thread.sleep(1000);
+                    Thread.sleep(10);
                 } else {
                     Airport at = itinerary.getFirst();
                     at.loadPassengers(this);

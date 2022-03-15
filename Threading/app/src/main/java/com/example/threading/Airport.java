@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class Airport {
+    // !!! Shared resource
     ArrayList<Passenger> travelers = new ArrayList<Passenger>();
     ArrayList<Airplane> airplanes = new ArrayList<Airplane>();
 
