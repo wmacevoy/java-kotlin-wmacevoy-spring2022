@@ -1,42 +1,80 @@
 package com.example.threading;
 
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 
 public class Itinerary {
+    private ReentrantLock lock = new ReentrantLock();
+    private Condition legIsAvailable = lock.newCondition();
     private LinkedList<Airport> destinations = new LinkedList<Airport>();
 
-    private Object baton = new Object();
-
-    public synchronized void  add(Airport airport) {
-        synchronized (baton) {
+    public void  add(Airport airport) {
+        try (Locker locker = new Locker(lock)) {
             destinations.add(airport);
+            if (destinations.size() >= 2) {
+                legIsAvailable.signal();
+            }
         }
     }
 
     public int size() {
-        synchronized (baton) {
+        try (Locker locker = new Locker(lock)) {
             return destinations.size();
         }
     }
 
-    public Leg firstLeg() {
-        synchronized (baton) {
+    public Leg nonblockingFirstLeg() {
+        try (Locker locker = new Locker(lock)) {
             if (destinations.size() >= 2) {
                 Airport from = destinations.getFirst();
                 destinations.removeFirst();
 
                 Airport to = destinations.getFirst();
-                destinations.removeFirst();
-
                 return new Leg(from,to);
+            } else {
+                return null;
             }
-            return null;
         }
-
     }
 
+    public Leg firstLeg() {
+        for (;;) {
+            try (Locker locker = new Locker(lock)) {
+                Leg leg = nonblockingFirstLeg();
+                if (leg != null) {
+                    return leg;
+                }
+                try {
+                    legIsAvailable.await();
+                } catch (InterruptedException e) {
+                    // ignored
+                }
+            }
+        }
+    }
 
-
-
-
+    public Leg firstLegWithin(int timeout) {
+        long t0 = System.currentTimeMillis();
+        long t1 = t0;
+        for (;;) {
+            try (Locker locker = new Locker(lock, (int)(timeout-(t1-t0)))) {
+                Leg leg = nonblockingFirstLeg();
+                if (leg != null) {
+                    return leg;
+                }
+                t1 = System.currentTimeMillis();
+                if (timeout <= t1-t0) break;
+                try {
+                    legIsAvailable.await(timeout-(t1-t0), TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    // ignored
+                }
+                t1 = System.currentTimeMillis();
+            }
+        }
+        return null;
+    }
 }

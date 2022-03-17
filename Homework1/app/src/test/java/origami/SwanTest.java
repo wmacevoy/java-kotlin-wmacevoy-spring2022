@@ -6,6 +6,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -56,6 +59,33 @@ public class SwanTest {
                 } else {
                     assertEquals(swan1.hashCode(), swan2.hashCode());
                     assertTrue(swan1.equals(swan2));
+                }
+            }
+        }
+    }
+
+
+    @Test
+    public void swanCompare() {
+        ArrayList<Swan> swans = new ArrayList<>();
+        for (int id = 0; id < names.length; ++id) {
+            swans.add(getSwan(names[id]));
+        }
+        Collections.sort(swans);
+        for (int i = 0; i < names.length; ++i) {
+            for (int j = 0; j < names.length; ++j) {
+                Swan swan1 = swans.get(i);
+                Swan swan2 = swans.get(j);
+                if (i == j) {
+                    assertTrue(swan1.compareTo(swan2) == 0);
+                    assertTrue(swan1.equals(swan2));
+                } else {
+                    assertFalse(swan1.equals(swan2));
+                    if (i < j) {
+                        assertTrue(swan1.compareTo(swan2) < 0);
+                    } else {
+                        assertTrue(swan1.compareTo(swan2) > 0);
+                    }
                 }
             }
         }

@@ -9,10 +9,13 @@ import org.junit.Test;
 public class SimulationTest {
     @Test
     public void sim() throws Exception {
-        Simulation sim = new Simulation();
+
         System.out.println("start.");
-        sim.setup();
-        Thread.sleep(60_000);
+        try (Simulation sim = new Simulation()) {
+            sim.setup();
+            Thread.sleep(60_000);
+            sim.join();
+        }
         System.out.println("stop.");
     }
 
