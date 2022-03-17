@@ -11,6 +11,7 @@ public class SimulationTest {
     public void sim() throws Exception {
 
         System.out.println("start.");
+        // try with resources
         try (Simulation sim = new Simulation()) {
             sim.setup();
             Thread.sleep(60_000);

@@ -62,14 +62,15 @@ public class Airplane implements Runnable, Comparable<Airplane>, AutoCloseable {
     @Override public void run() {
         while (running) {
             try {
-                Leg leg = itinerary.firstLeg();
+                Leg leg = itinerary.firstLegWithin(1000);
+                if (leg == null) continue;
                 airport = leg.from;
                 loadPassengers();
                 airport.airplanes.remove(this);
                 airport = null;
                 System.out.println("Flying " + this + " from " + leg.from + " to " + leg.to + "...");
                 try {
-                    Thread.sleep(4000);
+                    Thread.sleep(400);
                 } finally {
                     airport = leg.to;
                     airport.airplanes.add(this);
@@ -79,7 +80,7 @@ public class Airplane implements Runnable, Comparable<Airplane>, AutoCloseable {
                 // ... ignore exception
             }
         }
-        System.out.println("" + toString() + " stopped.");
+        System.out.println("" + this + " stopped.");
     }
 
     @Override

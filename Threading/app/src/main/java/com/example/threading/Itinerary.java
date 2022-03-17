@@ -61,6 +61,7 @@ public class Itinerary {
         long t1 = t0;
         for (;;) {
             try (Locker locker = new Locker(lock, (int)(timeout-(t1-t0)))) {
+                if (! locker.locked() ) return null;
                 Leg leg = nonblockingFirstLeg();
                 if (leg != null) {
                     return leg;
