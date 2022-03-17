@@ -8,8 +8,15 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 public class Airport {
+    final String name;
+    Airport(String name) { this.name = name; }
     // !!! Shared resource
-    Travelers travelers = new Travelers();
+    final Travelers travelers = new Travelers();
     // shared resource
-    Set<Airplane> airplanes = Collections.synchronizedSet(new TreeSet<Airplane>());
+    final Set<Airplane> airplanes = Collections.synchronizedSet(new TreeSet<Airplane>());
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

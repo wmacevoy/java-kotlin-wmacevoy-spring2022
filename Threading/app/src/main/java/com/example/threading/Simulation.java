@@ -8,35 +8,60 @@ import java.util.SplittableRandom;
 
 public class Simulation implements AutoCloseable
 {
+    static int rand(int a, int b) {
+        return (int)(a + (b-a+1)*Math.random());
+    }
+
+    static String rand(String [] options) {
+        return options[rand(0,options.length-1)];
+    }
 
     List<Airport> airports = new ArrayList<Airport>();
     List<Airplane> airplanes = new ArrayList<Airplane>();
     List<Passenger> passengers = new ArrayList<Passenger>();
 
-    Passenger makeTraveler(Airport airport) {
+    String [] firstNames = new String[] { "Alice", "Bob", "Cindy", "Doug", "Ella", "Francis"};
+    String [] lastNames = new String[] { "O'Roark", "Smith", "Fernandez", "Lopez"};
+
+    String randPattern(String pattern) {
         StringBuilder sb = new StringBuilder();
-        for (int i=0; i<8; ++i) {
-            sb.append('a' + (int) (26*Math.random()));
+        for (int i=0; i<pattern.length(); i += Character.charCount(Character.codePointAt(pattern,i))) {
+            int codePoint = Character.codePointAt(pattern,i);
+            switch(codePoint) {
+                case 'a': sb.append((char) rand('a','z')); break;
+                case 'A': sb.append((char) rand('A','Z')); break;
+                case '#': sb.append((char) rand('0','9')); break;
+                default: sb.appendCodePoint(codePoint); break;
+            }
         }
-        String name = sb.toString();
+        return sb.toString();
+    }
+
+    Passenger makeTraveler(Airport airport) {
+        String name = rand(firstNames)
+                + " " + randPattern("Aaaaaaaa")
+                + " " + rand(lastNames);
+
         Passenger passenger = new Passenger(name);
         passengers.add(passenger);
         airport.travelers.add(passenger);
         return passenger;
     }
 
-    int planes = 0;
+    String [] airlineNames = new String[] { "american", "quantas", "delta", "turkish"};
+
     Airplane makeAirplane(Airport airport) {
-        ++planes;
-        String name = "#" + planes;
+        String name = rand(airlineNames) + " #" + randPattern("A#A#");
         Airplane airplane = new Airplane(name, airport);
         airplanes.add(airplane);
         return airplane;
     }
 
     Airport makeAirport() {
-        Airport airport = new Airport();
-        for (int i = 0; i < 10; ++i) {
+
+        String name = randPattern("AAAA");
+        Airport airport = new Airport(name);
+        for (int i = 0; i < 100; ++i) {
             makeTraveler(airport);
         }
         for (int i=0; i<5; ++i) {

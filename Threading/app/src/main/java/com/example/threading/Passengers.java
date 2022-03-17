@@ -20,4 +20,8 @@ public class Passengers {
             return unloaded;
         }
     }
+
+    @Override
+    public String toString() { return roster.toString(); }
+
 }

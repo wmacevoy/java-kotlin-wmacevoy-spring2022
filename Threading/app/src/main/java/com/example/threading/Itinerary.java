@@ -56,11 +56,11 @@ public class Itinerary {
         }
     }
 
-    public Leg firstLegWithin(int timeout) {
+    public Leg firstLegWithin(long timeout) {
         long t0 = System.currentTimeMillis();
         long t1 = t0;
         for (;;) {
-            try (Locker locker = new Locker(lock, (int)(timeout-(t1-t0)))) {
+            try (Locker locker = new Locker(lock, timeout-(t1-t0))) {
                 if (! locker.locked() ) return null;
                 Leg leg = nonblockingFirstLeg();
                 if (leg != null) {

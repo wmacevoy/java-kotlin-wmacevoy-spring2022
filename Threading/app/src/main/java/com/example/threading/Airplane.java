@@ -7,9 +7,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class Airplane implements Runnable, Comparable<Airplane>, AutoCloseable {
-    private String name;
+    private final String name;
+    private final Thread pilot;
     private Airport airport;
-    private Thread pilot;
 
     public Airplane(String name, Airport airport) {
         this.name = name;
@@ -30,10 +30,10 @@ public class Airplane implements Runnable, Comparable<Airplane>, AutoCloseable {
     }
 
     public void join() {
-        close();
         for (;;) {
             try {
-                pilot.join();
+                close();
+                pilot.join(1000);
                 return;
             } catch (InterruptedException e) {
             }
@@ -45,18 +45,22 @@ public class Airplane implements Runnable, Comparable<Airplane>, AutoCloseable {
     }
 
     public void loadPassengers() {
-        int n = 1+ ((int) Math.random()*3);
+        int n = Simulation.rand(1,3);
+        int m = 0;
         for (int i=0;i<n; ++i) {
             Passenger passenger = airport.travelers.getRandomPassenger();
             if (passenger != null) {
                 passengers.add(passenger);
+                ++m;
             }
         }
+        System.out.println(this + " loaded " + m  + " passengers " + passengers);
     }
 
     public void unloadPassengers() {
         Set<Passenger> unloaded = passengers.unload();
         airport.travelers.addAll(unloaded);
+        System.out.println(airport + " unloaaded " + unloaded + " from " + this);
     }
 
     @Override public void run() {
@@ -85,7 +89,7 @@ public class Airplane implements Runnable, Comparable<Airplane>, AutoCloseable {
 
     @Override
     public String toString() {
-        return "Airplane " + name;
+        return name;
     }
 
     @Override

@@ -12,7 +12,7 @@ class Locker implements AutoCloseable {
     Locker(ReentrantLock lock, long timeout) {
         this.lock = null;
         try {
-            if (lock.tryLock(timeout, TimeUnit.MILLISECONDS)) {
+            if (timeout > 0 ? lock.tryLock(timeout, TimeUnit.MILLISECONDS) : lock.tryLock()) {
                 this.lock = lock;
             }
         } catch (InterruptedException e) {
@@ -20,10 +20,12 @@ class Locker implements AutoCloseable {
     }
 
     boolean locked() { return lock != null; }
-
+    void unlock() {
+        if (lock != null) { lock.unlock(); }
+        lock = null;
+    }
     @Override
     public void close() {
-        if (lock != null) lock.unlock();
-        lock = null;
+        unlock();
     }
 }

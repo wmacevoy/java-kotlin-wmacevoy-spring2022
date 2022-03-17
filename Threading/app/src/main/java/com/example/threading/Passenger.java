@@ -25,4 +25,8 @@ public class Passenger implements Comparable<Passenger> {
     public int compareTo(Passenger passenger) {
         return name.compareTo(passenger.name);
     }
+
+    @Override
+    public String toString() { return name ; }
+
 }
