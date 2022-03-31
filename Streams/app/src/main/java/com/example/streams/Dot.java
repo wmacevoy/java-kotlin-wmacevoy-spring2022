@@ -3,7 +3,29 @@ package com.example.streams;
 import java.util.Objects;
 
 public class Dot {
-    double longitude, latitude;
+
+    final double longitude, latitude;
+
+    void toUVW(double [] uvw) {
+        double phi = Math.toRadians(latitude);
+        double lambda = Math.toRadians(longitude);
+        uvw[0] = Math.cos(lambda)*Math.cos(phi);
+        uvw[1] = Math.sin(lambda)*Math.cos(phi);
+        uvw[2] = Math.sin(phi);
+    }
+
+    double[] getUVW() {
+        double [] uvw = new double[3];
+        toUVW(uvw);
+        return uvw;
+    }
+
+    void toXYZ(double [] xyz) {
+        toUVW(xyz);
+        xyz[0] *= MEAN_EARTH_RADIUS_KM;
+        xyz[1] *= MEAN_EARTH_RADIUS_KM;
+        xyz[2] *= MEAN_EARTH_RADIUS_KM;
+    }
 
     // https://en.wikipedia.org/wiki/Great-circle_distance
     double unitdist(Dot to) {
@@ -34,6 +56,14 @@ public class Dot {
     public Dot(double longitude, double latitude) {
         this.longitude = longitude;
         this.latitude = latitude;
+    }
+
+    public Dot(double [] xyz) {
+        double r = Math.sqrt(Math.pow(xyz[0],2)+Math.pow(xyz[1],2)+Math.pow(xyz[2],2));
+        double phi = Math.asin(xyz[2]/r);
+        double lambda = (xyz[0] != 0 || xyz[1] != 0) ? Math.atan2(xyz[1],xyz[0]) : 0.0;
+        this.longitude = Math.toDegrees(lambda);
+        this.latitude = Math.toDegrees(phi);
     }
 
     @Override
