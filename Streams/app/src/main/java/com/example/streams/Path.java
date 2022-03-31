@@ -7,27 +7,25 @@ import androidx.annotation.RequiresApi;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
-public class Path extends ArrayList<Dot> {
+public class Path extends ArrayList<Segment> {
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     double lengthInKm() {
-        double ans = 0;
-        for (int i = 0; i < size() - 1; ++i) {
-            ans += get(i).distanceToInKm(get(i + 1));
-        }
-        return ans;
+        return parallelStream().mapToDouble(segment -> segment.lengthInKm()).sum();
     }
 
-    double distanceToInKm(Dot to) {
-        double minDist = Double.MAX_VALUE;
-        for (int i = 0; i < size(); ++i) {
-            minDist = Math.min(minDist, get(i).distanceToInKm(to));
+    double lengthInKmSlow() {
+        double ans = 0;
+        for (Segment segment : this) {
+            ans += segment.lengthInKm();
         }
-        return minDist;
+        return ans;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     double distanceToInKmInParallel(Dot to) {
         return parallelStream()
-                .mapToDouble(dot -> dot.distanceToInKm(to))
+                .mapToDouble(segment -> segment.nearestTo(to).distanceToInKm(to))
                 .min()
                 .orElse(Double.MAX_VALUE);
     }

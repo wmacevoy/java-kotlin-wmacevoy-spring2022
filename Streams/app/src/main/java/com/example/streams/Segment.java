@@ -63,4 +63,8 @@ public class Segment {
         this.a = a;
         this.b = b;
     }
+
+    double lengthInKm() {
+        return a.distanceToInKm(b);
+    }
 }
