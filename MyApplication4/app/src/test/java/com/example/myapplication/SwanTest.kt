@@ -8,6 +8,8 @@ class SwanTest {
 
     @Test
     fun getName() {
+        var swan = Swan("alice","blue");
+        assertEquals(swan.name,"alice");
     }
 
     @Test

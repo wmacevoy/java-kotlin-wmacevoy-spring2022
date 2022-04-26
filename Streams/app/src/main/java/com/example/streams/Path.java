@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 public class Path extends ArrayList<Segment> {
+    Path() { super(); }
+    Path(int capacity) { super(capacity); }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     double lengthInKm() {

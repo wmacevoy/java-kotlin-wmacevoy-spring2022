@@ -3,8 +3,11 @@ package com.example.streams;
 import java.util.Objects;
 
 public class Dot {
-
     final double longitude, latitude;
+
+    Dot opposite() {
+        return new Dot(longitude,latitude+180.0);
+    }
 
     void toUVW(double [] uvw) {
         double phi = Math.toRadians(latitude);
@@ -53,7 +56,27 @@ public class Dot {
         return unitdist(to) * MEAN_EARTH_RADIUS_KM;
     }
 
+    public static double fmod(double x, double y) {
+        if (y < 0) {
+            x = -x;
+            y = -y;
+        }
+        double u = x / y;
+        u = u - Math.floor(u);
+        return y * u;
+    }
+
     public Dot(double longitude, double latitude) {
+        latitude = fmod(latitude+180.0,360.0)-180.0;
+        if (latitude > 90.0) {
+            latitude = 180.0 - latitude;
+            longitude += 180;
+        } else if (latitude < -90.0) {
+            latitude = -180 + latitude;
+            longitude += 180;
+        }
+        longitude = fmod(longitude+180.0,360.0)-180.0;
+
         this.longitude = longitude;
         this.latitude = latitude;
     }
@@ -78,4 +101,28 @@ public class Dot {
     public int hashCode() {
         return Objects.hash(longitude, latitude);
     }
+
+    public static final Dot ORIGIN = new Dot(0,0);
+    public static final Dot NORTH_POLE = new Dot(0,90);
+    public static final Dot SOUTH_POLE = new Dot(0,-90);
+    public static final Dot EAST_POLE = new Dot(90, 0);
+    public static final Dot WEST_POLE = new Dot(-90,0);
+    public static final Dot PORTLAND_OR = new Dot(toDecimalDegrees(122, 40, 55),
+            toDecimalDegrees(45, 31, 12));
+    public static final Dot GRAND_JUNCTION_CO = new Dot(toDecimalDegrees(108,34), toDecimalDegrees(39,4));
+
+    public static final Dot SALT_LAKE_CITY_UT = new Dot(-toDecimalDegrees(111,53,28),toDecimalDegrees(40,45,39));
+
+    public static final Dot MONTROSE_CO = new Dot(
+            -toDecimalDegrees(107,51,56),
+            toDecimalDegrees(38,28,37));
+
+    public static double toDecimalDegrees(double degrees, double minutes) {
+        return degrees+minutes/60.0;
+    }
+
+    public static double toDecimalDegrees(double degrees, double minutes, double seconds) {
+        return degrees + minutes / 60.0 + seconds / 3600.0;
+    }
+
 }
